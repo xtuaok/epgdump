@@ -401,8 +401,9 @@ void	conv_title_subtitle(EIT_CONTROL *eitptr)
         return ;
     }
 }
-void	enqueue(EIT_CONTROL *top, EIT_CONTROL *eitptr)
+void	enqueue(EIT_CONTROL *top, EIT_CONTROL **eitptr_)
 {
+    EIT_CONTROL *eitptr = *eitptr_;
     EIT_CONTROL	*cur ;
     cur = top ;
     time_t		rc ;
@@ -419,7 +420,8 @@ void	enqueue(EIT_CONTROL *top, EIT_CONTROL *eitptr)
                 free(eitptr->title);
                 free(eitptr->subtitle);
                 free(eitptr);
-                return ;
+                *eitptr_ = NULL;
+                return;
             }
             if(rc > 0){
                 if(cur->prev != 0){
@@ -602,7 +604,7 @@ int dumpEIT2(unsigned char *ptr, SVT_CONTROL *svttop,EITCHECK *chk)
                             cur->freeCA = eitb.free_CA_mode;
                             cur->duration = getDurationSec(eitb.duration);
                             cur->start_time = getStartTime(eitb.start_time);
-                            enqueue(eittop, cur);
+                            enqueue(eittop, &cur);
                             if ((eith.table_id >= 0x50) && (!svtcur->haveeitschedule)) {
                                 svtcur->haveeitschedule=1;
 #ifdef DEBUG
